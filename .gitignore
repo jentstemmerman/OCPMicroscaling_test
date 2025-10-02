@@ -1,0 +1,41 @@
+# Build directories and generated files
+build/
+*.o
+*.a
+*.so
+*.exe
+*.dll
+*.lib
+
+# CMake generated files (if built in-source)
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+DartConfiguration.tcl
+Makefile
+Testing/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Compiler and linker outputs
+*.out
+*.dSYM/
+
+# CUDA specific
+*.cubin
+*.ptx
+*.fatbin
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
