@@ -3,7 +3,11 @@
 #include <cstdio>
 #include <vector>
 
-void ConvertKernel_fp32_to_fp6(const float *pIn, nv_fp6_e3m2 *pOut, size_t N) {
+
+
+
+void ConvertKernel_fp32_to_fp6(const float *pIn, nv_fp6_e3m2 *pOut, size_t N) 
+{
 
     float *pInputFloat32DataOnGPU; 
     nv_fp6_e3m2 *pOutputDataOnGPU; 
@@ -11,7 +15,7 @@ void ConvertKernel_fp32_to_fp6(const float *pIn, nv_fp6_e3m2 *pOut, size_t N) {
     const uint32_t fp6_e3m2_buffer_size = N * sizeof(nv_fp6_e3m2);
     const uint32_t fp32_buffer_size     = N * sizeof(float);
 
-    cudaMalloc(&pInputFloat32DataOnGPU, N * sizeof(float));
+    cudaMalloc(&pInputFloat32DataOnGPU, fp32_buffer_size);
     cudaMalloc(&pOutputDataOnGPU, fp6_e3m2_buffer_size);
 
     cudaMemcpy(pInputFloat32DataOnGPU, pIn, fp32_buffer_size, cudaMemcpyHostToDevice);
@@ -21,14 +25,15 @@ void ConvertKernel_fp32_to_fp6(const float *pIn, nv_fp6_e3m2 *pOut, size_t N) {
     cudaMemcpy(pOut, pOutputDataOnGPU, fp6_e3m2_buffer_size, cudaMemcpyDeviceToHost);
 
     for (size_t i=0;i<N;i++) {
-        printf("fp32: %f -> fp6_e3m2: 0x%02x\n", pIn[i], pOut[i]);
+        printf("fp32: %f -> fp6_e3m2: 0x%02x\n", pIn[i], pOut[i].data);
     }
 
     cudaFree(pInputFloat32DataOnGPU); 
     cudaFree(pOutputDataOnGPU);
 }
 
-void ConvertKernel_fp6_to_fp32(const nv_fp6_e3m2 *pIn, float *pOut, size_t N) {
+void ConvertKernel_fp6_to_fp32(const nv_fp6_e3m2 *pIn, float *pOut, size_t N) 
+{
     nv_fp6_e3m2 *pInputDataOnGPU; 
     float *pOutputFloat32DataOnGPU; 
 
@@ -48,14 +53,16 @@ void ConvertKernel_fp6_to_fp32(const nv_fp6_e3m2 *pIn, float *pOut, size_t N) {
     
 
     for (size_t i=0;i<N;i++) {
-        printf("fp6_e3m2: 0x%02x -> fp32: %f\n", pIn[i], pOut[i]);
+        printf("fp6_e3m2: 0x%02x -> fp32: %f\n", pIn[i].data, pOut[i]);
     }
 
     cudaFree(pInputDataOnGPU); 
     cudaFree(pOutputFloat32DataOnGPU);
 }
 
-int main() {
+int main() 
+{
+    printf("FP6<e3m2> conversion test\n");
     const size_t N = 8;
     float h_vals[N] = {0.f, 1.f, -1.f, 0.5f, 3.2f, -2.75f, 10.f, 1e-2f};
 
