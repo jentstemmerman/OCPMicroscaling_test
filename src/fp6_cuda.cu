@@ -8,7 +8,7 @@ __host__ __device__ float half_raw_to_float(__half_raw h_raw) {
     return __half2float(h); // convert to float32
 }
 
- __host__ __device__  void ConvertKernel_fp32_to_fp6_e2m3_CUDA(const float *pIn, unsigned char *pOut, size_t N) 
+ __host__ __device__  void ConvertKernel_fp32_to_fp6_e2m3_CUDA(const float *pIn, unsigned char *pOut) 
 {
     float x = *pIn;
     struct __nv_fp6_e2m3 a = __nv_fp6_e2m3(x); 
@@ -16,7 +16,7 @@ __host__ __device__ float half_raw_to_float(__half_raw h_raw) {
     pOut[0] = (uint8_t)a.__x; 
 }
 
- __host__ __device__  void ConvertKernel_fp6_e2m3_to_fp32_CUDA(const unsigned char *pIn, float *pOut, size_t N) 
+ __host__ __device__  void ConvertKernel_fp6_e2m3_to_fp32_CUDA(const unsigned char *pIn, float *pOut) 
 {
     __nv_fp6_storage_t x = *reinterpret_cast<const __nv_fp6_storage_t*>(pIn);
     __nv_fp6_interpretation_t  interpretation = __NV_E2M3;
@@ -26,7 +26,7 @@ __host__ __device__ float half_raw_to_float(__half_raw h_raw) {
     *pOut = half_raw_to_float(half_raw);
 }
 
- __host__ __device__  void ConvertKernel_fp32_to_fp6_e3m2_CUDA(const float *pIn, unsigned char *pOut, size_t N) 
+ __host__ __device__  void ConvertKernel_fp32_to_fp6_e3m2_CUDA(const float *pIn, unsigned char *pOut) 
 {
     float x = *pIn;
     struct __nv_fp6_e3m2 a = __nv_fp6_e3m2(x);
@@ -34,7 +34,7 @@ __host__ __device__ float half_raw_to_float(__half_raw h_raw) {
     pOut[0] = (uint8_t)a.__x;
 }
 
- __host__ __device__  void ConvertKernel_fp6_e3m2_to_fp32_CUDA(const unsigned char *pIn, float *pOut, size_t N) 
+ __host__ __device__  void ConvertKernel_fp6_e3m2_to_fp32_CUDA(const unsigned char *pIn, float *pOut) 
 {
     __nv_fp6_storage_t x = *reinterpret_cast<const __nv_fp6_storage_t*>(pIn);
     __nv_fp6_interpretation_t  interpretation = __NV_E3M2;
@@ -46,7 +46,7 @@ __host__ __device__ float half_raw_to_float(__half_raw h_raw) {
     *pOut = half_raw_to_float(half_raw);
 }
 
- __host__ __device__  void ConvertKernel_fp32_to_fp8_e4m3_CUDA(const float *pIn, unsigned char *pOut, size_t N) 
+ __host__ __device__  void ConvertKernel_fp32_to_fp8_e4m3_CUDA(const float *pIn, unsigned char *pOut) 
 {
     float x = *pIn;
     struct __nv_fp8_e4m3 a = __nv_fp8_e4m3(x);
@@ -54,7 +54,7 @@ __host__ __device__ float half_raw_to_float(__half_raw h_raw) {
     pOut[0] = (uint8_t)a.__x;
 }
 
- __host__ __device__  void ConvertKernel_fp8_e4m3_to_fp32_CUDA(const unsigned char *pIn, float *pOut, size_t N) 
+ __host__ __device__  void ConvertKernel_fp8_e4m3_to_fp32_CUDA(const unsigned char *pIn, float *pOut) 
 {
     __nv_fp8_storage_t x = *reinterpret_cast<const __nv_fp8_storage_t*>(pIn);
     __nv_fp8_interpretation_t  interpretation = __NV_E4M3;
@@ -65,7 +65,7 @@ __host__ __device__ float half_raw_to_float(__half_raw h_raw) {
     *pOut = half_raw_to_float(half_raw);
 }
 
- __host__ __device__  void ConvertKernel_fp32_to_fp8_e5m2_CUDA(const float *pIn, unsigned char *pOut, size_t N) 
+ __host__ __device__  void ConvertKernel_fp32_to_fp8_e5m2_CUDA(const float *pIn, unsigned char *pOut) 
 {
     float x = *pIn;
     struct __nv_fp8_e5m2 a = __nv_fp8_e5m2(x);
@@ -73,7 +73,7 @@ __host__ __device__ float half_raw_to_float(__half_raw h_raw) {
     pOut[0] = (uint8_t)a.__x;
 }
 
- __host__ __device__  void ConvertKernel_fp8_e5m2_to_fp32_CUDA(const unsigned char *pIn, float *pOut, size_t N) 
+ __host__ __device__  void ConvertKernel_fp8_e5m2_to_fp32_CUDA(const unsigned char *pIn, float *pOut) 
 {
     __nv_fp8_storage_t x = *reinterpret_cast<const __nv_fp8_storage_t*>(pIn);
     __nv_fp8_interpretation_t  interpretation = __NV_E5M2;
@@ -86,7 +86,7 @@ __host__ __device__ float half_raw_to_float(__half_raw h_raw) {
 
 
 
- __host__ __device__  void ConvertKernel_int_to_scale_CUDA(const float *pIn, __nv_fp8x2_e8m0 *pOut, size_t N) 
+ __host__ __device__  void ConvertKernel_int_to_scale_CUDA(const float *pIn, __nv_fp8x2_e8m0 *pOut) 
 {
     float2 a = {*pIn, *pIn}; 
 

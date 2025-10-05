@@ -28,13 +28,13 @@ target_include_directories(mx_fp6 PUBLIC
 
 set_target_properties(mx_fp6 PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
-add_executable(example src/main.cu)
+add_executable(convert src/main.cu)
 
-target_link_libraries(example PRIVATE mx_fp6)
+target_link_libraries(convert PRIVATE mx_fp6)
 
 # Ensure CUDA libraries can be found at link time
-target_link_directories(example PRIVATE /usr/local/cuda/lib64)
-set_target_properties(example PROPERTIES
+target_link_directories(convert PRIVATE /usr/local/cuda/lib64)
+set_target_properties(convert PROPERTIES
   BUILD_RPATH "/usr/local/cuda/lib64"
 )
 

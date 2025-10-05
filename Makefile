@@ -23,7 +23,7 @@ OBJ_LIB = build/fp6.o build/fp6_cuda.o   #$(patsubst src/%.cu, build/%.o, $(SRC_
 LIB = build/libmx_fp6.a
 
 EXAMPLE_SRC = src/main.cu
-EXAMPLE_BIN = build/example
+EXAMPLE_BIN = build/convert
 
 TEST_SRC = tests/test_fp6.cu
 TEST_BIN = build/test_fp6
