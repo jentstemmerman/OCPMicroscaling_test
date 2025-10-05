@@ -1,4 +1,3 @@
-#include "fp6.cuh"
 #include "fp6_cuda.cuh"
 #include <cassert>
 #include <cmath>

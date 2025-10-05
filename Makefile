@@ -19,7 +19,7 @@ AR ?= ar
 ARFLAGS = rcs
 
 SRC_LIB = src/fp6.cu src/fp6_cuda.cu
-OBJ_LIB = build/fp6.o build/fp6_cuda.o   #$(patsubst src/%.cu, build/%.o, $(SRC_LIB))
+OBJ_LIB = build/fp6_cuda.o   #$(patsubst src/%.cu, build/%.o, $(SRC_LIB))
 LIB = build/libmx_fp6.a
 
 EXAMPLE_SRC = src/main.cu

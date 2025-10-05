@@ -1,7 +1,7 @@
-#include "fp6.cuh"
 #include <cmath>
 #include <cstdio>
 #include <cuda_fp6.h>
+#include <cstdint>
 
 __host__ __device__ float half_raw_to_float(__half_raw h_raw) {
     __half h = *reinterpret_cast<__half*>(&h_raw); // reinterpret raw bits as __half
