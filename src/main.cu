@@ -7,17 +7,38 @@
 #include <cstring>
 #include <vector>
 
+// Helper function to convert single fp value to float based on format
+float convert_fp_to_float(unsigned char fp_value, int format_id) {
+    float result = 0.0f;
+    switch (format_id) {
+        case 0:
+            ConvertKernel_fp6_e2m3_to_fp32_CUDA(&fp_value, &result);
+            break;
+        case 1:
+            ConvertKernel_fp6_e3m2_to_fp32_CUDA(&fp_value, &result);
+            break;
+        case 2:
+            ConvertKernel_fp8_e4m3_to_fp32_CUDA(&fp_value, &result);
+            break;
+        case 3:
+            ConvertKernel_fp8_e5m2_to_fp32_CUDA(&fp_value, &result);
+            break;
+    }
+    return result;
+}
+
 void print_usage(const char* prog_name) {
     printf("Usage: %s [--quiet] <direction> <value> <format_id>\n", prog_name);
     printf("  --quiet: optional flag to output only the result value (for use with other tools)\n");
     printf("  direction: 'compress' for float32 to fp conversion, 'expand' for fp to float32 conversion\n");
     printf("  value: \n");
     printf("    - for compress: floating point value (e.g., 3.14159)\n");
-    printf("    - for expand: hex value with 0x prefix (e.g., 0x42) or decimal integer\n");
+    printf("    - for expand: single hex/decimal value OR range (e.g., 0x42, 66, or 0x10-0x20)\n");
     printf("  format_id: 0 for fp6_e2m3, 1 for fp6_e3m2, 2 for fp8_e4m3, 3 for fp8_e5m2\n");
     printf("\nExamples:\n");
     printf("  %s compress 3.14159 1        # Convert float 3.14159 to fp6_e3m2\n", prog_name);
     printf("  %s expand 0x42 1             # Convert hex 0x42 from fp6_e3m2 to float\n", prog_name);
+    printf("  %s expand 0x10-0x20 1        # Convert range 0x10 to 0x20 from fp6_e3m2 to float\n", prog_name);
     printf("  %s --quiet compress 3.14 1   # Output only the hex result\n", prog_name);
     printf("  %s --quiet expand 0x42 1     # Output only the float result\n", prog_name);
 }
@@ -111,51 +132,72 @@ int main(int argc, char* argv[])
                 break;
         }
     } else if (is_expand) {
-        // Parse input as hex (0x prefix) or decimal integer
-        if (strncmp(value_str, "0x", 2) == 0 || strncmp(value_str, "0X", 2) == 0) {
-            input_fp = (unsigned char)strtol(value_str, NULL, 16);
+        // Check if value_str contains a range (e.g., "0x10-0x20")
+        // Make a mutable copy of value_str to work with
+        char value_copy[256];
+        strncpy(value_copy, value_str, sizeof(value_copy) - 1);
+        value_copy[sizeof(value_copy) - 1] = '\0';
+        
+        char* dash_pos = strchr(value_copy, '-');
+        
+        if (dash_pos != NULL) {
+            // Handle range expansion
+            *dash_pos = '\0'; // Split the string
+            char* start_str = value_copy;
+            char* end_str = dash_pos + 1;
+            
+            unsigned char start_val, end_val;
+            
+            // Parse start value
+            if (strncmp(start_str, "0x", 2) == 0 || strncmp(start_str, "0X", 2) == 0) {
+                start_val = (unsigned char)strtol(start_str, NULL, 16);
+            } else {
+                start_val = (unsigned char)atoi(start_str);
+            }
+            
+            // Parse end value
+            if (strncmp(end_str, "0x", 2) == 0 || strncmp(end_str, "0X", 2) == 0) {
+                end_val = (unsigned char)strtol(end_str, NULL, 16);
+            } else {
+                end_val = (unsigned char)atoi(end_str);
+            }
+            
+            if (!quiet_mode) {
+                printf("%s expansion range: 0x%02x to 0x%02x\n", format_names[format_id], start_val, end_val);
+            }
+            
+            // Loop through the range
+            for (unsigned char val = start_val; val <= end_val; val++) {
+                float result = convert_fp_to_float(val, format_id);
+                
+                if (quiet_mode) {
+                    printf("%f\n", result);
+                } else {
+                    printf("%s 0x%02x -> fp32 %f\n", format_names[format_id], val, result);
+                }
+                
+                // Prevent infinite loop if end_val is 255 (max unsigned char)
+                if (val == end_val) break;
+            }
         } else {
-            input_fp = (unsigned char)atoi(value_str);
-        }
-        
-        if (!quiet_mode) {
-            printf("%s expansion: 0x%02x (%d)\n", format_names[format_id], input_fp, input_fp);
-        }
-        
-        // Perform reverse conversion based on format
-        switch (format_id) {
-            case 0: // fp6_e2m3
-                ConvertKernel_fp6_e2m3_to_fp32_CUDA(&input_fp, &output_float);
-                if (quiet_mode) {
-                    printf("%f\n", output_float);
-                } else {
-                    printf("fp6_e2m3 0x%02x -> fp32 %f\n", input_fp, output_float);
-                }
-                break;
-            case 1: // fp6_e3m2
-                ConvertKernel_fp6_e3m2_to_fp32_CUDA(&input_fp, &output_float);
-                if (quiet_mode) {
-                    printf("%f\n", output_float);
-                } else {
-                    printf("fp6_e3m2 0x%02x -> fp32 %f\n", input_fp, output_float);
-                }
-                break;
-            case 2: // fp8_e4m3
-                ConvertKernel_fp8_e4m3_to_fp32_CUDA(&input_fp, &output_float);
-                if (quiet_mode) {
-                    printf("%f\n", output_float);
-                } else {
-                    printf("fp8_e4m3 0x%02x -> fp32 %f\n", input_fp, output_float);
-                }
-                break;
-            case 3: // fp8_e5m2
-                ConvertKernel_fp8_e5m2_to_fp32_CUDA(&input_fp, &output_float);
-                if (quiet_mode) {
-                    printf("%f\n", output_float);
-                } else {
-                    printf("fp8_e5m2 0x%02x -> fp32 %f\n", input_fp, output_float);
-                }
-                break;
+            // Handle single value expansion (original behavior)
+            if (strncmp(value_str, "0x", 2) == 0 || strncmp(value_str, "0X", 2) == 0) {
+                input_fp = (unsigned char)strtol(value_str, NULL, 16);
+            } else {
+                input_fp = (unsigned char)atoi(value_str);
+            }
+            
+            if (!quiet_mode) {
+                printf("%s expansion: 0x%02x (%d)\n", format_names[format_id], input_fp, input_fp);
+            }
+            
+            output_float = convert_fp_to_float(input_fp, format_id);
+            
+            if (quiet_mode) {
+                printf("%f\n", output_float);
+            } else {
+                printf("%s 0x%02x -> fp32 %f\n", format_names[format_id], input_fp, output_float);
+            }
         }
     }
 
