@@ -1,0 +1,14 @@
+Usage: ./build/convert [--quiet] <direction> <value> <format_id>
+  --quiet: optional flag to output only the result value (for use with other tools)
+  direction: 'compress' for float32 to fp conversion, 'expand' for fp to float32 conversion
+  value: 
+    - for compress: floating point value (e.g., 3.14159)
+    - for expand: single hex/decimal value OR range (e.g., 0x42, 66, or 0x10-0x20)
+  format_id: 0 for fp6_e2m3, 1 for fp6_e3m2, 2 for fp8_e4m3, 3 for fp8_e5m2
+
+Examples:
+  ./build/convert compress 3.14159 1        # Convert float 3.14159 to fp6_e3m2
+  ./build/convert expand 0x42 1             # Convert hex 0x42 from fp6_e3m2 to float
+  ./build/convert expand 0x10-0x20 1        # Convert range 0x10 to 0x20 from fp6_e3m2 to float
+  ./build/convert --quiet compress 3.14 1   # Output only the hex result
+  ./build/convert --quiet expand 0x42 1     # Output only the float result
